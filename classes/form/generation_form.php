@@ -21,7 +21,7 @@ class generation_form extends \moodleform {
         
         $mform = $this->_form;
         
-        // Скрытое поле с ID курса
+        // ========== СКРЫТОЕ ПОЛЕ С ID КУРСА (ОБЯЗАТЕЛЬНО!) ==========
         $mform->addElement('hidden', 'course_id');
         $mform->setType('course_id', PARAM_INT);
         $mform->setDefault('course_id', $COURSE->id);
@@ -68,19 +68,16 @@ class generation_form extends \moodleform {
         $mform->setType('topic', PARAM_TEXT);
         $mform->addRule('topic', null, 'required');
         
-        // Количество терминов
         $count_options = [10 => '10 терминов', 25 => '25 терминов', 50 => '50 терминов'];
         $mform->addElement('select', 'terms_count', get_string('terms_count', 'local_glossary_ai'), $count_options);
         $mform->setDefault('terms_count', 10);
         
-        // Язык
         $mform->addElement('select', 'language', get_string('language', 'local_glossary_ai'), [
             'ru' => 'Русский',
             'en' => 'English'
         ]);
         $mform->setDefault('language', 'ru');
         
-        // Дополнительные настройки
         $mform->addElement('filepicker', 'source_file', get_string('source_file', 'local_glossary_ai'), null, [
             'accepted_types' => ['.txt', '.docx'],
             'maxbytes' => 10485760
