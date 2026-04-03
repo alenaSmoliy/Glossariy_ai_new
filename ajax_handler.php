@@ -43,20 +43,6 @@ switch ($action) {
             \local_glossary_ai\editor\term_editor::clear_session();
         }
         break;
-        
-    case 'add_to_glossary':
-        $glossary_id = required_param('glossary_id', PARAM_INT);
-        $term = required_param('term', PARAM_TEXT);
-        $definition = required_param('definition', PARAM_RAW);
-        
-        $manager = new \local_glossary_ai\glossary\term_manager($glossary_id);
-        $result = $manager->add_term($term, $definition);
-        
-        $response['success'] = $result['success'];
-        if (!$result['success'] && isset($result['error'])) {
-            $response['error'] = $result['error'];
-        }
-        break;
 }
 
 echo json_encode($response, JSON_UNESCAPED_UNICODE);
