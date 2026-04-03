@@ -169,4 +169,47 @@ class gigachat_client {
         }
         
         $token = $this->get_access_token();
-       
+        if (!$token) {
+            return ['error' => 'token_failed'];
+        }
+        
+        $prompt = $this->build_prompt($topic, $count, $language, $context, $custom_prompt);
+        
+        $headers = [
+            "Authorization: Bearer {$token}",
+            "Content-Type: application/json"
+        ];
+        
+        $body = json_encode([
+            "model" => $this->model,
+            "messages" => [
+                ["role" => "user", "content" => $prompt]
+            ],
+            "temperature" => $this->temperature,
+            "max_tokens" => 4000
+        ]);
+        
+        $ch = curl_init($this->api_url . '/api/v1/chat/completions');
+        curl_setopt_array($ch, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_POST => true,
+            CURLOPT_HTTPHEADER => $headers,
+            CURLOPT_POSTFIELDS => $body,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false,
+            CURLOPT_TIMEOUT => $this->timeout
+        ]);
+        
+        $response = curl_exec($ch);
+        curl_close($ch);
+        
+        $data = json_decode($response, true);
+        
+        if (isset($data['choices'][0]['message']['content'])) {
+            $content = $data['choices'][0]['message']['content'];
+            return $this->parse_response($content);
+        }
+        
+        return false;
+    }
+}
