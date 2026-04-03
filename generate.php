@@ -39,7 +39,7 @@ if ($session_terms) {
     $client = new \local_glossary_ai\api\gigachat_client();
     
     if (!$client->is_configured()) {
-        $api_error = get_string('error_api_not_configured', 'local_glossary_ai');
+        $api_error = 'API GigaChat не настроен. Проверьте файл конфигурации.';
     } else {
         $result = $client->generate_terms(
             $generation_data['topic'],
@@ -50,13 +50,13 @@ if ($session_terms) {
         );
         
         if (is_array($result) && isset($result['error'])) {
-            $api_error = get_string('error_generation', 'local_glossary_ai');
+            $api_error = 'Ошибка генерации терминов';
         } elseif (is_array($result) && !empty($result)) {
             $terms = $result;
             \local_glossary_ai\editor\term_editor::save_terms_to_session($terms, $generation_data['glossary_id']);
             $glossary_id = $generation_data['glossary_id'];
         } else {
-            $api_error = get_string('error_generation', 'local_glossary_ai');
+            $api_error = 'Не удалось сгенерировать термины';
         }
     }
     
@@ -119,6 +119,7 @@ echo '<!DOCTYPE html>
         .btn-secondary:hover { background: #5a6268; }
         .btn-success { background: #28a745; color: white; }
         .btn-success:hover { background: #218838; }
+        .btn-success:disabled { background: #6c757d; cursor: not-allowed; }
         .terms-table {
             width: 100%;
             border-collapse: collapse;
@@ -177,23 +178,6 @@ echo '<!DOCTYPE html>
         @keyframes fadeOut {
             to { opacity: 0; visibility: hidden; }
         }
-        .loading {
-            text-align: center;
-            padding: 40px;
-        }
-        .spinner {
-            display: inline-block;
-            width: 40px;
-            height: 40px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #007bff;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
         .footer {
             text-align: center;
             margin-top: 25px;
@@ -211,7 +195,7 @@ if ($api_error) {
     echo '<div class="alert alert-danger">❌ ' . htmlspecialchars($api_error) . '</div>';
     echo '<div style="text-align: center;"><a href="' . $CFG->wwwroot . '/local/glossary_ai/index.php?id=' . $course_id . '" class="btn btn-primary">← Вернуться к генерации</a></div>';
 } elseif (!$terms || empty($terms)) {
-    echo '<div class="alert alert-warning">⚠️ ' . get_string('error_generation', 'local_glossary_ai') . '</div>';
+    echo '<div class="alert alert-warning">⚠️ Нет сгенерированных терминов</div>';
     echo '<div style="text-align: center;"><a href="' . $CFG->wwwroot . '/local/glossary_ai/index.php?id=' . $course_id . '" class="btn btn-primary">← Попробовать снова</a></div>';
 } else {
     echo '<div class="header">';
